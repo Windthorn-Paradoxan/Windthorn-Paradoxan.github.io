@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Linear A × EMx – Codec + Engineering Overview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #050816;
+      --panel: #0b1020;
+      --panel-soft: #11172b;
+      --accent: #4ade80;
+      --accent-soft: rgba(74, 222, 128, 0.15);
+      --accent-2: #38bdf8;
+      --accent-3: #f97316;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+      --radius-lg: 18px;
+      --radius-sm: 10px;
+      --shadow-deep: 0 18px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #111827 0, #020617 50%, #000 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: linear-gradient(145deg, rgba(15,23,42,0.98), rgba(3,7,18,0.98));
+      border-radius: 24px;
+      padding: 24px 24px 32px;
+      box-shadow: var(--shadow-deep);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      backdrop-filter: blur(16px);
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .title-block {
+      max-width: 680px;
+    }
+
+    h1 {
+      font-size: clamp(1.9rem, 3vw, 2.3rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pill {
+      font-size: 0.65rem;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 0.75rem;
+    }
+
+    .tag {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(55,65,81,0.8);
+      color: #e5e7eb;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 2fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 960px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    section {
+      background: radial-gradient(circle at top left, #111827 0, #020617 55%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 16px 16px 18px;
+      box-shadow: 0 12px 32px rgba(15,23,42,0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    section::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at top, rgba(56,189,248,0.06), transparent 55%),
+        radial-gradient(circle at bottom, rgba(74,222,128,0.05), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    section > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #e5e7eb;
+      margin-bottom: 8px;
+    }
+
+    .section-title span.icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      background: radial-gradient(circle, rgba(56,189,248,0.9), rgba(59,130,246,0.3));
+      box-shadow: 0 0 18px rgba(56,189,248,0.75);
+    }
+
+    .section-sub {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .card {
+      background: rgba(15,23,42,0.96);
+      border-radius: var(--radius-sm);
+      padding: 10px 10px 11px;
+      border: 1px solid rgba(55,65,81,0.85);
+    }
+
+    .card h3 {
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      font-size: 0.68rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(15,118,110,0.28);
+      border: 1px solid rgba(45,212,191,0.4);
+      color: #a5f3fc;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    p {
+      font-size: 0.84rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .kv {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+
+    .kv span.key {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .pill-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .mini-pill {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(75,85,99,0.8);
+      color: #e5e7eb;
+    }
+
+    .diagram {
+      margin-top: 10px;
+      padding: 9px;
+      border-radius: 10px;
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.16), rgba(15,23,42,0.98));
+      border: 1px solid rgba(55,65,81,0.9);
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.78rem;
+      color: #e5e7eb;
+      overflow-x: auto;
+    }
+
+    .diagram pre {
+      white-space: pre;
+    }
+
+    .axis-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    .highlight {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .accent-2 { color: var(--accent-2); }
+    .accent-3 { color: var(--accent-3); }
+
+    .steps {
+      margin-top: 6px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 5px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 6px;
+      align-items: baseline;
+      font-size: 0.8rem;
+    }
+
+    .step-num {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      background: rgba(148,163,184,0.15);
+      color: #e5e7eb;
+    }
+
+    .right-column-note {
+      margin-top: 10px;
+      padding: 7px 9px;
+      border-radius: 8px;
+      background: rgba(15,23,42,0.96);
+      border: 1px dashed rgba(75,85,99,0.9);
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="title-block">
+        <h1>
+          <span>Linear A × EMx</span>
+          <span class="pill">Codec &amp; Engineering Map</span>
+        </h1>
+        <p class="subtitle">
+          A compact visual summary of how the <strong>Linear A codec</strong> and the
+          <strong>engineering specification model</strong> behave as an EMx-compatible
+          procedural language: token · topology · time.
+        </p>
+        <div class="tag-row">
+          <span class="tag">EMx-compatible notation</span>
+          <span class="tag">Hydraulic engineering</span>
+          <span class="tag">Bronze Age → modern equivalence</span>
+          <span class="tag">Ternary operator lattice</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- LEFT SIDE: Codec + EMx glue -->
+      <section>
+        <div class="section-title">
+          <span class="icon">λ</span>
+          <span>Linear A Codec as EMx Surface</span>
+        </div>
+        <p class="section-sub">
+          The codec treats Linear A not as a spoken language, but as a compact
+          <strong>engineering notation</strong> built from EMx-style operators and domains.:contentReference[oaicite:0]{index=0}
+        </p>
+
+        <div class="grid">
+          <div class="card">
+            <h3>1. Core idea <span class="badge">codec</span></h3>
+            <p>
+              Each Linear A sign is a <span class="highlight">function symbol</span> in a
+              procedure: channels, containers, junctions, cycles, validation marks.
+              Instead of sentences, you get executable lines like “survey, excavate,
+              line, gate, test, repeat”.:contentReference[oaicite:1]{index=1}
+            </p>
+            <div class="kv">
+              <span><span class="key">What it encodes:</span> flow, capacity, geometry, time, checks</span>
+              <span><span class="key">What it skips:</span> subject-verb grammar, narrative</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>2. EMx mapping <span class="badge">T₀ lattice</span></h3>
+            <p>
+              The codec explicitly ties sign groups to EMx operators:
+              <span class="highlight">O₂ Flux</span> for flow symbols,
+              <span class="highlight">O₆ Normalize</span> for containers,
+              <span class="highlight">O₇ Exchange</span> for junctions,
+              <span class="highlight">O₁₀ Iteration</span> for cycles, etc.:contentReference[oaicite:2]{index=2}
+            </p>
+            <div class="pill-strip">
+              <span class="mini-pill">O₂: 𐘦 𐘧 𐘩 (flow)</span>
+              <span class="mini-pill">O₆: 𐘱 𐘲 𐘮 (capacity)</span>
+              <span class="mini-pill">O₇: 𐘁 𐘄 𐘇 (junction)</span>
+              <span class="mini-pill">O₁₀: 𐘓↻ (cycle)</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>3. Operator grammar</h3>
+            <p>
+              Around the Linear A signs sits a small “meta-alphabet” of arrows,
+              brackets and markers that act like a visible EMx control layer:
+              →, ⇒, ⟨A|B⟩, [A+B], ↻, ⊙, @, :: etc.:contentReference[oaicite:3]{index=3}
+            </p>
+            <div class="diagram">
+<pre>Flow:   𐘦 → 𐘧          # source → branch
+Choice: 𐘁⟨𐘦|𐘧⟩       # pick one path
+Both:   𐘁[𐘦+𐘧]       # run both in parallel
+Time:   𐘓↻96          # 96-tick seasonal/solar cycle
+Close:  𐘫 ⊙ ✓          # loop closed, spec validated</pre>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>4. Built-in error checking</h3>
+            <p>
+              The codec bakes in logical checks: impossible gradients, unclosed loops,
+              capacity overflow, missing checkpoints, and absent final closure get
+              explicit ⊗ error markers and suggested fixes.:contentReference[oaicite:4]{index=4}
+            </p>
+            <div class="pill-strip">
+              <span class="mini-pill">⊗ Flow uphill? → add pump / fix slope</span>
+              <span class="mini-pill">⊗ No closure? → 𐘫 ⊙ ✓</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="diagram" style="margin-top:12px;">
+<pre># EMx view of the codec
+Text  →  Tokens        →  Operators             →  World
+────     ─────────────    ─────────────────────    ─────────────────────
+Sign     𐘦 𐘁 𐘱 ...     O₂  O₇  O₆ ...          Water, gates, basins...
+
+Layer    TOKEN          TOPOLOGY                 TIME
+         𐘦,𐘁,𐘱        who connects to whom     ↻96 cycles, checkpoints</pre>
+          <div class="axis-label">Three layers align directly with EMx: symbol · geometry · time.</div>
+        </div>
+      </section>
+
+      <!-- RIGHT SIDE: Engineering + examples -->
+      <section>
+        <div class="section-title">
+          <span class="icon">⚙</span>
+          <span>Engineering Specs in Practice</span>
+        </div>
+        <p class="section-sub">
+          The engineering document shows those symbols behaving as real
+          construction programs: irrigation channels, proto-cement, gates,
+          gradients, and maintenance cycles.:contentReference[oaicite:5]{index=5}
+        </p>
+
+        <div class="card">
+          <h3>1. Example: Irrigation channel</h3>
+          <p>
+            A full build is expressed as a short Linear A program: survey, dig, line,
+            gate, test, maintain. Each step is an EMx operator chain with parameters.:contentReference[oaicite:6]{index=6}
+          </p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>Survey &amp; layout:
+                <span class="accent-2">𐘦→𐘊(W=2,D=1,G=1:1000)</span> – width, depth, gradient on site.:contentReference[oaicite:7]{index=7}
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>Excavate with daily cycle:
+                <span class="accent-2">𐘓↻ daily excavation</span> – 1 cubit per team per day.:contentReference[oaicite:8]{index=8}
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div>Line channel with proto-cement:
+                <span class="accent-2">𐘴(lime)+𐘶(ash,3:1) → 𐘟(walls)</span>.:contentReference[oaicite:9]{index=9}
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div>Install a junction gate:
+                <span class="accent-2">𐘁@10cubits</span> – timber sluice at 10 cubits.:contentReference[oaicite:10]{index=10}
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">5</div>
+              <div>Test &amp; validate:
+                <span class="accent-2">𐘦(test flow) → 𐙁 (validate)</span> – leak check, flow-rate mark.:contentReference[oaicite:11]{index=11}
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">6</div>
+              <div>Operate with seasonal cycles:
+                <span class="accent-2">𐘓↻ seasonal cycles</span> – daily, weekly, annual routines.:contentReference[oaicite:12]{index=12}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:10px;">
+          <h3>2. EMx composites behind the scenes</h3>
+          <p>
+            Underneath the symbols, the engineering doc writes the same thing
+            as EMx operator compositions: excavation, distribution, and stabilization
+            become short chains of O₁–O₁₀.:contentReference[oaicite:13]{index=13}
+          </p>
+          <div class="diagram">
+<pre># Excavation routine
+R = O₁₀ ∘ O₆ ∘ O₅ ∘ O₂ ∘ O₁
+
+  𐘓↻96         # cycle (O₁₀)
+  ∘ 𐘱(boundary) # normalize geometry (O₆)
+  ∘ 𐘑(slope)    # project gradient (O₅)
+  ∘ 𐘦(flow)     # flux (O₂)
+  ∘ 𐘀(init)     # lift/init state (O₁)</pre>
+          </div>
+          <div class="diagram" style="margin-top:6px;">
+<pre># Stabilization protocol
+S = O₆ ∘ O₄ ∘ O₃
+
+  𐘟(symmetric)        # normalization shell
+  ∘ 𐘫(mixing loop)    # closure of cycle
+  ∘ 𐘴+𐘶(cement mix)  # composition / curvature</pre>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:10px;">
+          <h3>3. “Are they any good?” (Modern check)</h3>
+          <p>
+            When you treat the spec as plain engineering and compare it to modern
+            codes, the numbers fall right into today’s optimal ranges.:contentReference[oaicite:14]{index=14}
+          </p>
+          <div class="kv">
+            <span><span class="key">Gradient:</span> 1:200 – same as modern gravity sewers.</span>
+            <span><span class="key">Settling tanks:</span> ~50 cubits spacing – within modern optimum.</span>
+            <span><span class="key">Velocity:</span> ≈0.6 m/s – exactly where you want it for erosion vs. silt.:contentReference[oaicite:15]{index=15}</span>
+            <span><span class="key">Proto-cement:</span> 3:1 lime:pozzolan – matches Roman opus signinum.:contentReference[oaicite:16]{index=16}</span>
+          </div>
+        </div>
+
+        <div class="right-column-note">
+          <strong>Context layer:</strong> the same signs behave consistently across
+          pyramids, irrigation, and aqueducts – they always mean “container”,
+          “junction”, “cycle”, etc., just with different physical realizations.:contentReference[oaicite:17]{index=17}
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom strip: how to read / use -->
+    <section style="margin-top:18px;">
+      <div class="section-title">
+        <span class="icon">☰</span>
+        <span>How to Read / Use This in Practice</span>
+      </div>
+      <p class="section-sub">
+        In EMx terms, the pair of documents is a complete “language spec”:
+        a symbol table + operator grammar + worked programs + validation rules +
+        historical calibration.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>1. As a codec</h3>
+          <p>
+            Treat each Linear A tablet as a compact program:
+            identify flow symbols (O₂), containers (O₆), junctions (O₇),
+            cycles (O₁₀), and validations (O₉), then read left-to-right
+            using the operator grammar.:contentReference[oaicite:18]{index=18}
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>2. As EMx verification</h3>
+          <p>
+            For any candidate reading, check that the implied system is
+            physically coherent (no impossible flow, missing closure, or
+            unchecked branches). The error section gives a direct checklist
+            for rejecting bad parses.:contentReference[oaicite:19]{index=19}
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>3. As an educational lab</h3>
+          <p>
+            You can build small models: decode a spec, construct it with a
+            hose or small channel, and compare observed flow and maintenance
+            needs to what the notation predicts. It’s a hands-on way to see
+            EMx-style operators in literal concrete.:contentReference[oaicite:20]{index=20}
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>4. As a historical lens</h3>
+          <p>
+            Viewed this way, Linear A stops being “mysterious writing” and
+            becomes an early CAD-like notation: engineers encoding flow,
+            geometry, and time in a ternary-compatible grammar that EMx can
+            talk to almost directly.:contentReference[oaicite:21]{index=21}
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

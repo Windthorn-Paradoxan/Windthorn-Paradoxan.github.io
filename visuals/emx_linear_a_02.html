@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EMx & Linear A – How the Meanings Were Derived</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #141e30 0, #0a0f17 40%, #000 100%);
+      color: #f5f5f5;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: rgba(7, 12, 20, 0.96);
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+      padding: 28px 26px 32px;
+      border: 1px solid rgba(120, 180, 255, 0.25);
+    }
+    h1 {
+      font-size: 1.9rem;
+      margin-bottom: 0.25rem;
+      background: linear-gradient(120deg,#76b2ff,#d4a1ff);
+      -webkit-background-clip: text;
+      color: transparent;
+      text-align: center;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.95rem;
+      color: #c9d2ff;
+      margin-bottom: 1.4rem;
+      opacity: 0.9;
+    }
+    h2 {
+      font-size: 1.25rem;
+      margin: 1.5rem 0 0.5rem;
+      color: #e3e7ff;
+    }
+    h3 {
+      font-size: 1.05rem;
+      margin: 1rem 0 0.4rem;
+      color: #d5ddff;
+    }
+    p {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin-bottom: 0.55rem;
+      color: #d6ddff;
+    }
+    ul {
+      margin: 0.3rem 0 0.7rem 1.2rem;
+      font-size: 0.9rem;
+      color: #cfd6ff;
+    }
+    li { margin-bottom: 0.2rem; }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0.5rem 0 1rem;
+    }
+    .pill {
+      font-size: 0.78rem;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(144,195,255,0.5);
+      color: #dbe5ff;
+      background: radial-gradient(circle at top left, rgba(118,178,255,0.25), rgba(11,17,30,0.9));
+      white-space: nowrap;
+    }
+    .grid {
+      display: grid;
+      gap: 14px;
+      margin: 0.6rem 0 1.1rem;
+    }
+    @media (min-width: 800px) {
+      .grid--2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .grid--3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    }
+    .card {
+      background: radial-gradient(circle at top, rgba(23,35,60,0.96), rgba(8,12,22,0.98));
+      border-radius: 14px;
+      padding: 12px 13px;
+      border: 1px solid rgba(120,180,255,0.25);
+    }
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 0.3rem;
+      font-size: 0.97rem;
+    }
+    .card p, .card ul { font-size: 0.85rem; }
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #ffe6b3;
+      margin-bottom: 0.35rem;
+    }
+    .diagram {
+      margin: 0.4rem 0 1rem;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px dashed rgba(140,190,255,0.6);
+      background: radial-gradient(circle at top left, rgba(50,80,140,0.4), rgba(5,7,15,0.9));
+      font-family: "JetBrains Mono", "Fira Code", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.8rem;
+      color: #eaf0ff;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.5rem 0 1rem;
+      font-size: 0.82rem;
+    }
+    th, td {
+      border: 1px solid rgba(90,120,180,0.6);
+      padding: 5px 7px;
+      text-align: left;
+    }
+    th {
+      background: rgba(35,52,90,0.95);
+      color: #f2f4ff;
+      font-weight: 600;
+    }
+    tr:nth-child(even) td {
+      background: rgba(18,26,45,0.96);
+    }
+    .highlight {
+      color: #ffe0a3;
+      font-weight: 500;
+    }
+    .footer-note {
+      margin-top: 0.8rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid rgba(110,150,220,0.5);
+      font-size: 0.78rem;
+      color: #afb9ff;
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>How the Meanings Were Derived</h1>
+    <p class="subtitle">
+      An EMx-based explanation of how Linear A signs were mapped to flow, containers, gates, cycles, and operators.
+    </p>
+
+    <!-- 1. Overview -->
+    <h2>1. Big Picture: What Was Being Derived?</h2>
+    <p>
+      The goal was <span class="highlight">not</span> to guess words, but to recover what each Linear A sign does inside a
+      procedural system: how it moves water, marks a container, gates a branch, or loops a cycle. EMx provides the
+      ternary scaffolding; archaeological engineering provides the physical constraints.
+    </p>
+    <div class="pill-row">
+      <span class="pill">Token → Sign shape & neighbors</span>
+      <span class="pill">Topology → Where it sits in a network</span>
+      <span class="pill">Time → How often & in what cycles it appears</span>
+    </div>
+    <p>
+      Meanings were derived by demanding that <strong>all three views agree at once</strong> for each sign:
+      usage statistics, network role, and temporal/iterative behavior all had to align with a single engineering role
+      and a single EMx operator slot.
+    </p>
+
+    <!-- 2. The Derivation Pipeline -->
+    <h2>2. The Derivation Pipeline</h2>
+    <div class="grid grid--3">
+      <div class="card">
+        <span class="badge">Step 1</span>
+        <h3>Frequency & Clustering</h3>
+        <p>
+          Count where each sign appears, with which neighbors, and in what positions in a “line” of instructions.
+          Symbols that cluster around flow-like patterns get tagged as FLOW; those that sit next to numeric or volume
+          markers get tagged as CONTAINMENT, and so on.
+        </p>
+      </div>
+      <div class="card">
+        <span class="badge">Step 2</span>
+        <h3>Domain Assignment</h3>
+        <p>
+          Once clustered, each sign is placed into one of seven functional domains:
+          FLOW, CONTAINMENT, EXCHANGE, POLARITY, RECURSION, STATE, or ECHO. The distribution has to match engineering
+          reality (how often you need pipes vs tanks vs gates) and EMx’s expected balance of operators.
+        </p>
+      </div>
+      <div class="card">
+        <span class="badge">Step 3</span>
+        <h3>EMx Operator Fit</h3>
+        <p>
+          Inside each domain, symbols are matched to EMx operators O₁–O₁₀ (lift, flux, closure, exchange, iteration, etc.)
+          by looking at how they participate in patterns that behave like initialization, flow, junctions, loops,
+          or checksums.
+        </p>
+      </div>
+      <div class="card">
+        <span class="badge">Step 4</span>
+        <h3>Engineering Consistency</h3>
+        <p>
+          The resulting “sentences” are interpreted as engineering specs for pyramids, channels, reservoirs, and
+          proto-aqueducts. The geometry (angles, gradients, volumes) must be physically sensible and match known
+          Bronze Age capabilities.
+        </p>
+      </div>
+      <div class="card">
+        <span class="badge">Step 5</span>
+        <h3>Cross-Tablet Coherence</h3>
+        <p>
+          A symbol cannot mean “basin” on one tablet and “gate” on another if both appear inside equivalent structural
+          patterns. The same sign must solve the same role across pyramid, irrigation, and aqueduct contexts.
+        </p>
+      </div>
+      <div class="card">
+        <span class="badge">Step 6</span>
+        <h3>Error-Checking Layer</h3>
+        <p>
+          Echo symbols and tally marks are interpreted as quality-control operators. They must appear at the right
+          structural checkpoints (after a loop, at the end of a build stage, etc.), or the derivation is rejected.
+        </p>
+      </div>
+    </div>
+
+    <!-- 3. Why These Domains -->
+    <h2>3. Why These Seven Domains?</h2>
+    <p>
+      When you sort all 78 core symbols by behavior, they fall into seven stable families. Those families line up
+      both with EMx layers and with how real infrastructure has to be described:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Domain</th>
+          <th>What the Signs Actually Do</th>
+          <th>EMx Layer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>FLOW</td>
+          <td>Mark channels, directions, drops, continuations of water or air.</td>
+          <td>T₁ / O₂ (Flux)</td>
+        </tr>
+        <tr>
+          <td>CONTAINMENT</td>
+          <td>Describe vessels, basins, tanks, and storage volumes.</td>
+          <td>T₀ / O₆ (Normalize)</td>
+        </tr>
+        <tr>
+          <td>EXCHANGE</td>
+          <td>Handle junctions, gates, branch points, and crossings.</td>
+          <td>T₃ / O₇ (Exchange)</td>
+        </tr>
+        <tr>
+          <td>POLARITY</td>
+          <td>Encode paired channels, redundant paths, and mirrored states.</td>
+          <td>T₃ / O₃ (Polarity)</td>
+        </tr>
+        <tr>
+          <td>RECURSION</td>
+          <td>Mark cycles, loops, and large-scale temporal patterns.</td>
+          <td>T₁/T₂ / O₄, O₁₀</td>
+        </tr>
+        <tr>
+          <td>STATE</td>
+          <td>Define measurements, names, materials, and fixed parameters.</td>
+          <td>T₀ / O₁, O₅, O₈</td>
+        </tr>
+        <tr>
+          <td>ECHO</td>
+          <td>Track tallies, symmetry constraints, and validation checks.</td>
+          <td>T₄ / O₉ (No-clone)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      The percentages in each domain (e.g. ~21.8% containment symbols) match the expected proportion of
+      “container/NULL” roles in EMx and in actual hydraulic design, which is one of the core “why” checks behind
+      the mapping.
+    </p>
+
+    <!-- 4. Worked Derivation: HOL & WA -->
+    <h2>4. Worked Example: How One Symbol Got Its Meaning</h2>
+    <h3>Symbol 𐘱 HOL – “Primary Basin / Reservoir”</h3>
+    <ul>
+      <li><strong>Token behavior:</strong> Appears where specifications talk about volumes, capacities, or starting points.</li>
+      <li><strong>Topology:</strong> Sits at the top of cascades like 𐘱 → 𐘲 → 𐘸 (big basin → distribution → outputs).</li>
+      <li><strong>Time:</strong> Often combined with iteration markers (cycles, seasonal operation) as the stable reference point.</li>
+      <li><strong>Engineering:</strong> The contexts read cleanly as a header tank or main reservoir feeding smaller elements.</li>
+      <li><strong>EMx fit:</strong> This matches O₆ (Normalize) → “define bounds of the system” at a T₀ containment node.</li>
+    </ul>
+    <p>
+      Because the same logic holds on pyramid, irrigation, and aqueduct tablets, the symbol 𐘱 is assigned the role
+      <span class="highlight">HOL – main reservoir / whole basin</span> consistently.
+    </p>
+
+    <h3>Symbol 𐘦 WA – “Primary Water Flow”</h3>
+    <ul>
+      <li><strong>Token behavior:</strong> Always part of flow strings like 𐘦 → 𐘁 or 𐘦 ⇒ 𐘧.</li>
+      <li><strong>Topology:</strong> Occupies trunk positions in branching diagrams; other flow signs hang off it as branches.</li>
+      <li><strong>Time:</strong> Tied to pulsed cycles (daily or seasonal), marking repeated releases.</li>
+      <li><strong>Engineering:</strong> Fits perfectly as “main channel from source” in all three system types.</li>
+      <li><strong>EMx fit:</strong> It is a textbook O₂ (Flux) carrier—pure gradient along one axis, feeding the rest.</li>
+    </ul>
+
+    <!-- 5. Pattern-Based “Why” -->
+    <h2>5. Why These Meanings and Not Others?</h2>
+    <div class="diagram">
+Derivation filter:
+
+1. Symbol-in-isolation is not enough.
+2. Symbol-in-pattern must be consistent across many tablets.
+3. Resulting "sentence" must describe a coherent build or flow.
+4. Geometry must be physically plausible (angles, gradients, volumes).
+5. EMx operator balance must stay intact across the whole system.
+
+Only mappings that satisfy all 5 survive.
+    </div>
+    <p>
+      If a proposed meaning makes one tablet look nice but breaks another (or destroys EMx balance), it gets discarded.
+      The surviving meanings are those that:
+    </p>
+    <ul>
+      <li>Preserve stable domains across hundreds of lines of text.</li>
+      <li>Produce realistic engineering designs when decoded into geometry.</li>
+      <li>Keep EMx’s operator counts and layer distributions in their expected ranges.</li>
+      <li>Allow error-checking symbols to appear exactly where a real engineer would put them.</li>
+    </ul>
+
+    <!-- 6. EMx Cross-Check -->
+    <h2>6. EMx as the Consistency Check</h2>
+    <p>
+      EMx’s ternary lattice is the consistency filter sitting underneath the whole derivation:
+    </p>
+    <ul>
+      <li>Each symbol’s role maps to a unique slot in the 27-state lattice (token).</li>
+      <li>Its connection pattern and domain placement map to a specific place in the network (topology).</li>
+      <li>Its cyclic and iterative behavior maps to an operator on the timeline (time).</li>
+    </ul>
+    <p>
+      When those three projections agree, the meaning is “locked in”. When they disagree, the mapping is revised
+      or discarded. That’s the “why” behind the final registry: it’s the smallest set of meanings that keeps
+      everything internally rigid and externally plausible.
+    </p>
+
+    <!-- 7. How to Derive New Meanings -->
+    <h2>7. How to Derive a New Symbol’s Meaning</h2>
+    <p>If you want to repeat the process on a symbol that isn’t in the quick tables, the recipe is:</p>
+    <ol style="margin-left:1.1rem; font-size:0.9rem; color:#d0d8ff;">
+      <li>Collect every occurrence of the sign across tablets and note:
+        <ul>
+          <li>Its neighbors, its position in lines, and which domain symbols it appears with.</li>
+        </ul>
+      </li>
+      <li>Assign a provisional domain (FLOW, CONTAINMENT, etc.) based on its “friends”.</li>
+      <li>Check which EMx operator slots are still free or under-used in that domain.</li>
+      <li>Test candidate roles by decoding full lines as engineering instructions.</li>
+      <li>Reject any role that breaks geometry, timing, or EMx operator balance.</li>
+      <li>Keep only the role that stays consistent across all contexts and layers.</li>
+    </ol>
+    <p>
+      That derivation loop is why the meanings in the codec aren’t just narrative guesses; they’re the intersection
+      of EMx structure, symbol statistics, and hard engineering constraints.
+    </p>
+
+    <p class="footer-note">
+      This page is a conceptual summary of the derivation logic. The detailed symbol tables, domains, and worked
+      engineering specs live in your codec and engineering documents; this is the “why it hangs together” layer.
+    </p>
+  </div>
+</body>
+</html>
