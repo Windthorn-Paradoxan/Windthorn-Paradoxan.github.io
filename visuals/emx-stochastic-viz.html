@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMx Stochastic Behavior</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0e27;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #64ffda;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+        
+        .canvas-container {
+            background: #1a1e3e;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            border-radius: 5px;
+            background: #0d1128;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
+            background: #1a1e3e;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #2a2e4e;
+        }
+        
+        .control-group label {
+            display: block;
+            color: #64ffda;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        
+        .control-group input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: #2a2e4e;
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #64ffda;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .value-display {
+            color: #fff;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-box {
+            background: #1a1e3e;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #2a2e4e;
+        }
+        
+        .stat-label {
+            color: #888;
+            font-size: 0.75rem;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            color: #64ffda;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        
+        .stat-value.warning {
+            color: #ffaa00;
+        }
+        
+        .stat-value.danger {
+            color: #ff4444;
+        }
+        
+        .info-panel {
+            background: #1a1e3e;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #64ffda;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+        
+        .info-panel h3 {
+            color: #64ffda;
+            margin-bottom: 10px;
+        }
+        
+        .info-panel code {
+            background: #0d1128;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #ffaa00;
+        }
+        
+        button {
+            background: #64ffda;
+            color: #0a0e27;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: #52e0c8;
+            transform: translateY(-2px);
+        }
+        
+        .controls-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EMx Stochastic Behavior</h1>
+        <div class="subtitle">Ternary State Space with Random Fluctuations</div>
+        
+        <div class="controls-row">
+            <button id="resetBtn">Reset System</button>
+            <button id="perturbBtn">Apply Random Perturbation</button>
+            <button id="normalizeBtn">Force O₆ Normalize</button>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">∅₀ Null Baseline</div>
+                <div class="stat-value" id="nullBaseline">0.220</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">β Drift</div>
+                <div class="stat-value" id="betaDrift">0.180</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">γ Closure</div>
+                <div class="stat-value" id="gammaClosure">0.996</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Current Tick</div>
+                <div class="stat-value" id="currentTick">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">O₆ Triggers</div>
+                <div class="stat-value" id="normalizeTriggers">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">System State</div>
+                <div class="stat-value" id="systemState">T₀</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>Stochastic Intensity: <span id="stochasticValue">0.15</span></label>
+                <input type="range" id="stochastic" min="0" max="1" step="0.01" value="0.15">
+            </div>
+            <div class="control-group">
+                <label>∅₀ Target: <span id="nullTargetValue">0.22</span></label>
+                <input type="range" id="nullTarget" min="0.10" max="0.35" step="0.01" value="0.22">
+            </div>
+            <div class="control-group">
+                <label>O₆ Threshold: <span id="thresholdValue">0.15</span></label>
+                <input type="range" id="threshold" min="0.05" max="0.30" step="0.01" value="0.15">
+            </div>
+            <div class="control-group">
+                <label>Animation Speed: <span id="speedValue">50</span>ms</label>
+                <input type="range" id="speed" min="10" max="200" step="10" value="50">
+            </div>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="stateCanvas" width="1200" height="400"></canvas>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="historyCanvas" width="1200" height="300"></canvas>
+        </div>
+        
+        <div class="info-panel">
+            <h3>EMx Stochastic Behavior Model</h3>
+            <p><strong>Ternary State Space:</strong> System operates in T₀ = {-0, 0, +0}³ with 27 possible states. Random fluctuations push states away from equilibrium.</p>
+            <p><strong>Null Baseline (∅₀):</strong> Target ~0.22 represents system reserve capacity. When ∅₀ drops below threshold, O₆ normalization triggers to restore stability.</p>
+            <p><strong>β Drift:</strong> Measures curvature/variance from baseline. High β indicates system stress requiring correction.</p>
+            <p><strong>γ Closure:</strong> Coherence metric (target ≥0.992). Low γ indicates broken closure (O₄ violation).</p>
+            <p><strong>O₆ Normalization:</strong> Backbone operator that returns system toward T₀ basin when metrics exceed thresholds. Automatic stabilization mechanism.</p>
+            <p><strong>Stochastic Events:</strong> Random perturbations simulate environmental noise, measurement uncertainty, or external interference. System must maintain stability despite continuous random inputs.</p>
+        </div>
+    </div>
+
+    <script>
+        // EMx Ternary State System with Stochastic Behavior
+        
+        const stateCanvas = document.getElementById('stateCanvas');
+        const historyCanvas = document.getElementById('historyCanvas');
+        const stateCtx = stateCanvas.getContext('2d');
+        const historyCtx = historyCanvas.getContext('2d');
+        
+        // System parameters
+        let params = {
+            stochastic: 0.15,
+            nullTarget: 0.22,
+            threshold: 0.15,
+            speed: 50
+        };
+        
+        // System state
+        let system = {
+            state: [0, 0, 0],  // Current ternary state {-0, 0, +0} mapped to {-1, 0, 1}
+            nullBaseline: 0.22,
+            beta: 0.18,
+            gamma: 0.996,
+            tick: 0,
+            normalizations: 0,
+            history: {
+                null: [],
+                beta: [],
+                gamma: []
+            }
+        };
+        
+        let animationInterval = null;
+        
+        // Ternary state representation
+        const ternary = {
+            NEG: -1,  // -0
+            ZERO: 0,  // 0
+            POS: 1    // +0
+        };
+        
+        // Initialize
+        function init() {
+            updateControlLabels();
+            resetSystem();
+            startAnimation();
+        }
+        
+        // Reset system to T₀ baseline
+        function resetSystem() {
+            system.state = [0, 0, 0];
+            system.nullBaseline = params.nullTarget;
+            system.beta = 0.18;
+            system.gamma = 0.996;
+            system.tick = 0;
+            system.normalizations = 0;
+            system.history = {
+                null: [],
+                beta: [],
+                gamma: []
+            };
+        }
+        
+        // Apply stochastic perturbation
+        function applyStochastic() {
+            // Random walk on each axis
+            for (let i = 0; i < 3; i++) {
+                const rand = (Math.random() - 0.5) * params.stochastic * 2;
+                system.state[i] += rand;
+                
+                // Clamp to ternary range
+                system.state[i] = Math.max(-1, Math.min(1, system.state[i]));
+            }
+            
+            // Update metrics based on state
+            updateMetrics();
+        }
+        
+        // Update system metrics
+        function updateMetrics() {
+            // Calculate k (non-zero axes)
+            let k = 0;
+            for (let i = 0; i < 3; i++) {
+                if (Math.abs(system.state[i]) > 0.1) k++;
+            }
+            
+            // α (structural alignment)
+            const alpha = k / 3;
+            
+            // β (drift/variance) - increases with distance from origin and k
+            const distFromOrigin = Math.sqrt(
+                system.state[0]**2 + 
+                system.state[1]**2 + 
+                system.state[2]**2
+            );
+            system.beta = 0.18 + (k * 0.18) + (distFromOrigin * 0.1);
+            
+            // γ (closure) - decreases with imbalance
+            const imbalance = Math.abs(system.state[0]) + 
+                            Math.abs(system.state[1]) + 
+                            Math.abs(system.state[2]);
+            system.gamma = 1.000 - (k * 0.004) - (imbalance * 0.002);
+            
+            // ∅₀ (null baseline) - fluctuates with system stress
+            system.nullBaseline = params.nullTarget + 
+                                (Math.random() - 0.5) * params.stochastic * 0.1 +
+                                (system.beta - 0.42) * 0.05;
+            
+            // Clamp metrics
+            system.beta = Math.max(0, Math.min(0.72, system.beta));
+            system.gamma = Math.max(0.90, Math.min(1.00, system.gamma));
+            system.nullBaseline = Math.max(0.10, Math.min(0.35, system.nullBaseline));
+        }
+        
+        // O₆ Normalization operator
+        function normalize() {
+            // Pull state toward origin (T₀ basin)
+            for (let i = 0; i < 3; i++) {
+                system.state[i] *= 0.7;  // Damping factor
+            }
+            
+            // Restore metrics toward baseline
+            system.beta *= 0.8;
+            system.gamma = Math.min(0.996, system.gamma + 0.02);
+            system.nullBaseline = params.nullTarget * 0.3 + system.nullBaseline * 0.7;
+            
+            system.normalizations++;
+        }
+        
+        // Check if normalization needed
+        function checkNormalization() {
+            const nullDeviation = Math.abs(system.nullBaseline - params.nullTarget);
+            const betaHigh = system.beta > 0.50;
+            const gammaLow = system.gamma < 0.992;
+            
+            if (nullDeviation > params.threshold || betaHigh || gammaLow) {
+                normalize();
+                return true;
+            }
+            return false;
+        }
+        
+        // Update visualization
+        function update() {
+            system.tick++;
+            applyStochastic();
+            checkNormalization();
+            
+            // Record history
+            system.history.null.push(system.nullBaseline);
+            system.history.beta.push(system.beta);
+            system.history.gamma.push(system.gamma);
+            
+            // Keep history manageable
+            if (system.history.null.length > 200) {
+                system.history.null.shift();
+                system.history.beta.shift();
+                system.history.gamma.shift();
+            }
+            
+            draw();
+            updateStats();
+        }
+        
+        // Draw state visualization
+        function draw() {
+            const w = stateCanvas.width;
+            const h = stateCanvas.height;
+            
+            // Clear
+            stateCtx.fillStyle = '#0d1128';
+            stateCtx.fillRect(0, 0, w, h);
+            
+            // Draw T₀ cube (3D projection)
+            drawTernaryCube();
+            
+            // Draw current state
+            drawCurrentState();
+            
+            // Draw history
+            drawHistory();
+        }
+        
+        // Draw ternary state cube
+        function drawTernaryCube() {
+            const w = stateCanvas.width;
+            const h = stateCanvas.height;
+            const cx = w * 0.25;
+            const cy = h * 0.5;
+            const size = 120;
+            
+            stateCtx.strokeStyle = '#2a2e4e';
+            stateCtx.lineWidth = 1;
+            
+            // Draw cube edges (simplified 3D)
+            const vertices = [];
+            for (let x = -1; x <= 1; x++) {
+                for (let y = -1; y <= 1; y++) {
+                    for (let z = -1; z <= 1; z++) {
+                        // Simple isometric projection
+                        const px = cx + (x * size * 0.5) + (z * size * 0.3);
+                        const py = cy - (y * size * 0.5) + (z * size * 0.2);
+                        vertices.push({x: px, y: py, state: [x, y, z]});
+                        
+                        // Draw vertex
+                        stateCtx.fillStyle = '#3a3e6e';
+                        stateCtx.beginPath();
+                        stateCtx.arc(px, py, 3, 0, Math.PI * 2);
+                        stateCtx.fill();
+                    }
+                }
+            }
+            
+            // Draw some connecting lines
+            stateCtx.beginPath();
+            // X-axis lines
+            for (let y = -1; y <= 1; y++) {
+                for (let z = -1; z <= 1; z++) {
+                    const p1 = vertices.find(v => v.state[0] === -1 && v.state[1] === y && v.state[2] === z);
+                    const p2 = vertices.find(v => v.state[0] === 1 && v.state[1] === y && v.state[2] === z);
+                    stateCtx.moveTo(p1.x, p1.y);
+                    stateCtx.lineTo(p2.x, p2.y);
+                }
+            }
+            stateCtx.stroke();
+            
+            // Labels
+            stateCtx.fillStyle = '#64ffda';
+            stateCtx.font = '12px Courier New';
+            stateCtx.fillText('T₀ State Space', cx - 50, cy - size - 20);
+            stateCtx.fillText('{-0, 0, +0}³', cx - 40, cy - size - 5);
+        }
+        
+        // Draw current system state
+        function drawCurrentState() {
+            const w = stateCanvas.width;
+            const h = stateCanvas.height;
+            const cx = w * 0.25;
+            const cy = h * 0.5;
+            const size = 120;
+            
+            // Project current state
+            const px = cx + (system.state[0] * size * 0.5) + (system.state[2] * size * 0.3);
+            const py = cy - (system.state[1] * size * 0.5) + (system.state[2] * size * 0.2);
+            
+            // Draw state point
+            stateCtx.fillStyle = '#64ffda';
+            stateCtx.shadowBlur = 20;
+            stateCtx.shadowColor = '#64ffda';
+            stateCtx.beginPath();
+            stateCtx.arc(px, py, 8, 0, Math.PI * 2);
+            stateCtx.fill();
+            stateCtx.shadowBlur = 0;
+            
+            // Draw line from origin
+            stateCtx.strokeStyle = '#64ffda';
+            stateCtx.lineWidth = 2;
+            stateCtx.globalAlpha = 0.5;
+            stateCtx.beginPath();
+            stateCtx.moveTo(cx, cy);
+            stateCtx.lineTo(px, py);
+            stateCtx.stroke();
+            stateCtx.globalAlpha = 1;
+            
+            // State coordinates
+            stateCtx.fillStyle = '#fff';
+            stateCtx.font = '11px Courier New';
+            const stateText = `(${system.state[0].toFixed(2)}, ${system.state[1].toFixed(2)}, ${system.state[2].toFixed(2)})`;
+            stateCtx.fillText(stateText, px + 15, py - 15);
+        }
+        
+        // Draw metric history
+        function drawHistory() {
+            const w = historyCanvas.width;
+            const h = historyCanvas.height;
+            
+            // Clear
+            historyCtx.fillStyle = '#0d1128';
+            historyCtx.fillRect(0, 0, w, h);
+            
+            // Grid
+            historyCtx.strokeStyle = '#1a1e3e';
+            historyCtx.lineWidth = 1;
+            for (let i = 0; i <= 10; i++) {
+                const y = (h / 10) * i;
+                historyCtx.beginPath();
+                historyCtx.moveTo(0, y);
+                historyCtx.lineTo(w, y);
+                historyCtx.stroke();
+            }
+            
+            // Draw metrics
+            if (system.history.null.length > 1) {
+                drawMetricLine(system.history.null, '#64ffda', 0.1, 0.35, '∅₀');
+                drawMetricLine(system.history.beta, '#ffaa00', 0, 0.72, 'β');
+                drawMetricLine(system.history.gamma, '#ff44aa', 0.90, 1.00, 'γ');
+            }
+            
+            // Target lines
+            historyCtx.strokeStyle = '#64ffda';
+            historyCtx.lineWidth = 1;
+            historyCtx.setLineDash([5, 5]);
+            const targetY = h - ((params.nullTarget - 0.1) / 0.25) * h;
+            historyCtx.beginPath();
+            historyCtx.moveTo(0, targetY);
+            historyCtx.lineTo(w, targetY);
+            historyCtx.stroke();
+            historyCtx.setLineDash([]);
+            
+            // Labels
+            historyCtx.fillStyle = '#888';
+            historyCtx.font = '10px Courier New';
+            historyCtx.fillText('History (200 ticks)', 10, 15);
+        }
+        
+        // Draw metric line
+        function drawMetricLine(data, color, min, max, label) {
+            const w = historyCanvas.width;
+            const h = historyCanvas.height;
+            const step = w / 200;
+            
+            historyCtx.strokeStyle = color;
+            historyCtx.lineWidth = 2;
+            historyCtx.beginPath();
+            
+            for (let i = 0; i < data.length; i++) {
+                const x = i * step;
+                const normalized = (data[i] - min) / (max - min);
+                const y = h - (normalized * h);
+                
+                if (i === 0) {
+                    historyCtx.moveTo(x, y);
+                } else {
+                    historyCtx.lineTo(x, y);
+                }
+            }
+            
+            historyCtx.stroke();
+            
+            // Label
+            if (data.length > 0) {
+                const lastY = h - ((data[data.length - 1] - min) / (max - min)) * h;
+                historyCtx.fillStyle = color;
+                historyCtx.font = 'bold 11px Courier New';
+                historyCtx.fillText(label, w - 25, lastY);
+            }
+        }
+        
+        // Update statistics display
+        function updateStats() {
+            document.getElementById('nullBaseline').textContent = system.nullBaseline.toFixed(3);
+            document.getElementById('betaDrift').textContent = system.beta.toFixed(3);
+            document.getElementById('gammaClosure').textContent = system.gamma.toFixed(3);
+            document.getElementById('currentTick').textContent = system.tick;
+            document.getElementById('normalizeTriggers').textContent = system.normalizations;
+            
+            // Color coding
+            const nullEl = document.getElementById('nullBaseline');
+            const nullDev = Math.abs(system.nullBaseline - params.nullTarget);
+            nullEl.className = 'stat-value ' + (nullDev > params.threshold ? 'danger' : nullDev > params.threshold * 0.5 ? 'warning' : '');
+            
+            const betaEl = document.getElementById('betaDrift');
+            betaEl.className = 'stat-value ' + (system.beta > 0.50 ? 'danger' : system.beta > 0.35 ? 'warning' : '');
+            
+            const gammaEl = document.getElementById('gammaClosure');
+            gammaEl.className = 'stat-value ' + (system.gamma < 0.992 ? 'danger' : system.gamma < 0.995 ? 'warning' : '');
+            
+            // Determine current T-layer
+            const distFromOrigin = Math.sqrt(
+                system.state[0]**2 + 
+                system.state[1]**2 + 
+                system.state[2]**2
+            );
+            let tLayer = 'T₀';
+            if (distFromOrigin > 0.8) tLayer = 'T₁';
+            if (distFromOrigin > 1.5) tLayer = 'T₂';
+            document.getElementById('systemState').textContent = tLayer;
+        }
+        
+        // Update control labels
+        function updateControlLabels() {
+            document.getElementById('stochasticValue').textContent = params.stochastic.toFixed(2);
+            document.getElementById('nullTargetValue').textContent = params.nullTarget.toFixed(2);
+            document.getElementById('thresholdValue').textContent = params.threshold.toFixed(2);
+            document.getElementById('speedValue').textContent = params.speed;
+        }
+        
+        // Animation control
+        function startAnimation() {
+            if (animationInterval) clearInterval(animationInterval);
+            animationInterval = setInterval(update, params.speed);
+        }
+        
+        // Event listeners
+        document.getElementById('stochastic').addEventListener('input', (e) => {
+            params.stochastic = parseFloat(e.target.value);
+            updateControlLabels();
+        });
+        
+        document.getElementById('nullTarget').addEventListener('input', (e) => {
+            params.nullTarget = parseFloat(e.target.value);
+            updateControlLabels();
+        });
+        
+        document.getElementById('threshold').addEventListener('input', (e) => {
+            params.threshold = parseFloat(e.target.value);
+            updateControlLabels();
+        });
+        
+        document.getElementById('speed').addEventListener('input', (e) => {
+            params.speed = parseInt(e.target.value);
+            updateControlLabels();
+            startAnimation();
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', resetSystem);
+        
+        document.getElementById('perturbBtn').addEventListener('click', () => {
+            // Large random perturbation
+            for (let i = 0; i < 3; i++) {
+                system.state[i] += (Math.random() - 0.5) * 1.5;
+                system.state[i] = Math.max(-1, Math.min(1, system.state[i]));
+            }
+            updateMetrics();
+        });
+        
+        document.getElementById('normalizeBtn').addEventListener('click', () => {
+            normalize();
+        });
+        
+        // Start
+        init();
+    </script>
+</body>
+</html>
